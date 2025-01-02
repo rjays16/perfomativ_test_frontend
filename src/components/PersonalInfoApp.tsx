@@ -39,7 +39,7 @@ interface PersonalInfo {
 }
 
 const API_URL = 'http://localhost:8000/api';
-
+const BASE_URL = 'http://localhost:8000/'
 const PersonalInfoApp = () => {
   const [people, setPeople] = useState<PersonalInfo[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -171,7 +171,7 @@ const PersonalInfoApp = () => {
                   <TableRow key={person.id}>
                     <TableCell>
                       <Avatar 
-                        src={person.image ? `/storage/${person.image}` : undefined}
+                        src={person.image ? `${BASE_URL}storage/${person.image}` : undefined}
                         alt={`${person.first_name} ${person.last_name}`}
                       >
                         {`${person.first_name[0]}${person.last_name[0]}`}
@@ -212,7 +212,7 @@ const PersonalInfoApp = () => {
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 <Avatar
                   sx={{ width: 100, height: 100 }}
-                  src={selectedPerson?.image ? `/storage/${selectedPerson.image}` : undefined}
+                  src={selectedPerson?.image ? `${BASE_URL}storage/${selectedPerson.image}` : undefined}
                 >
                   {selectedPerson ? `${selectedPerson.first_name[0]}${selectedPerson.last_name[0]}` : 'UP'}
                 </Avatar>
