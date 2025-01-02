@@ -39,8 +39,10 @@ interface PersonalInfo {
 }
 
 const API_URL = 'http://localhost:8000/api';
-const BASE_URL = 'http://localhost:8000/'
+const BASE_URL = 'http://localhost:8000/';
+
 const PersonalInfoApp = () => {
+  const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [people, setPeople] = useState<PersonalInfo[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<PersonalInfo | null>(null);
@@ -51,6 +53,12 @@ const PersonalInfoApp = () => {
     fetchPeople();
   }, []);
 
+  useEffect(() => {
+    if (!isDialogOpen) {
+      setImagePreview(undefined);
+    }
+  }, [isDialogOpen]);
+
   const fetchPeople = async () => {
     try {
       const response = await fetch(`${API_URL}/personal-information`);
@@ -60,6 +68,17 @@ const PersonalInfoApp = () => {
       console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -75,7 +94,6 @@ const PersonalInfoApp = () => {
         ? `${API_URL}/personal-information/${selectedPerson.id}`
         : `${API_URL}/personal-information`;
 
-      // For update, we need to add _method field
       if (selectedPerson) {
         formData.append('_method', 'PUT');
       }
@@ -90,8 +108,9 @@ const PersonalInfoApp = () => {
 
       if (!response.ok) throw new Error('Network response was not ok');
 
-      fetchPeople();
+      await fetchPeople();
       setIsDialogOpen(false);
+      setImagePreview(undefined);
     } catch (error) {
       console.error('Error saving:', error);
     }
@@ -105,7 +124,7 @@ const PersonalInfoApp = () => {
         });
 
         if (!response.ok) throw new Error('Network response was not ok');
-        fetchPeople();
+        await fetchPeople();
       } catch (error) {
         console.error('Error deleting:', error);
       }
@@ -131,24 +150,26 @@ const PersonalInfoApp = () => {
                 startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />
               }}
             />
-           <Button 
-           variant="contained" 
-           startIcon={<AddIcon />}
-           onClick={() => {
-            setSelectedPerson(null);
-            setIsDialogOpen(true);
-          }}
-          sx={{ 
-            backgroundColor: '#2196f3',
-            color: 'white',
-            fontWeight: 'bold',
-            padding: '8px 16px',
-            whiteSpace: 'nowrap', 
-            '&:hover': {
-              backgroundColor: '#1976d2'
-            }
-            }}
-            >Add Person</Button>
+            <Button 
+              variant="contained" 
+              startIcon={<AddIcon />}
+              onClick={() => {
+                setSelectedPerson(null);
+                setIsDialogOpen(true);
+              }}
+              sx={{ 
+                backgroundColor: '#2196f3',
+                color: 'white',
+                fontWeight: 'bold',
+                padding: '8px 16px',
+                whiteSpace: 'nowrap', 
+                '&:hover': {
+                  backgroundColor: '#1976d2'
+                }
+              }}
+            >
+              Add Person
+            </Button>
           </Box>
 
           <Table>
@@ -212,7 +233,7 @@ const PersonalInfoApp = () => {
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 <Avatar
                   sx={{ width: 100, height: 100 }}
-                  src={selectedPerson?.image ? `${BASE_URL}storage/${selectedPerson.image}` : undefined}
+                  src={imagePreview || (selectedPerson?.image ? `${BASE_URL}storage/${selectedPerson.image}` : undefined)}
                 >
                   {selectedPerson ? `${selectedPerson.first_name[0]}${selectedPerson.last_name[0]}` : 'UP'}
                 </Avatar>
@@ -222,7 +243,13 @@ const PersonalInfoApp = () => {
                   variant="outlined"
                 >
                   Upload Photo
-                  <input type="file" name="image" accept="image/*" hidden />
+                  <input 
+                    type="file" 
+                    name="image" 
+                    accept="image/*" 
+                    hidden 
+                    onChange={handleImageChange}
+                  />
                 </Button>
               </Box>
 
