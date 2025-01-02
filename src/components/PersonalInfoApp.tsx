@@ -131,16 +131,24 @@ const PersonalInfoApp = () => {
                 startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />
               }}
             />
-            <Button 
-              variant="contained" 
-              startIcon={<AddIcon />}
-              onClick={() => {
-                setSelectedPerson(null);
-                setIsDialogOpen(true);
-              }}
-            >
-              Add Person
-            </Button>
+           <Button 
+           variant="contained" 
+           startIcon={<AddIcon />}
+           onClick={() => {
+            setSelectedPerson(null);
+            setIsDialogOpen(true);
+          }}
+          sx={{ 
+            backgroundColor: '#2196f3',
+            color: 'white',
+            fontWeight: 'bold',
+            padding: '8px 16px',
+            whiteSpace: 'nowrap', 
+            '&:hover': {
+              backgroundColor: '#1976d2'
+            }
+            }}
+            >Add Person</Button>
           </Box>
 
           <Table>
