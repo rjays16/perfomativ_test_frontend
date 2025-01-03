@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   Typography,
-  TextField,
   Button,
   Table,
   TableBody, 
@@ -15,7 +14,6 @@ import {
   IconButton,
 } from '@mui/material';
 import {
-  Search,
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -23,6 +21,7 @@ import {
 import AddRecords from './AddRecords';
 import EditRecords from './EditRecords';
 import DeleteRecords from './DeleteRecords';
+import SearchRecords from './SearchRecords';
 
 interface PersonalInfo {
   id: number;
@@ -143,14 +142,9 @@ const PersonalInfoApp = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-            <TextField
-              fullWidth
-              placeholder="Search records..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />
-              }}
+            <SearchRecords 
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
             />
             <Button 
               variant="contained" 
