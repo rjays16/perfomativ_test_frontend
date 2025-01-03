@@ -6,9 +6,6 @@ import {
   Typography,
   TextField,
   Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
   Table,
   TableBody, 
   TableCell,
@@ -16,15 +13,14 @@ import {
   TableRow,
   Avatar,
   IconButton,
-  Stack
 } from '@mui/material';
 import {
   Search,
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  CloudUpload as UploadIcon
 } from '@mui/icons-material';
+import AddRecords from './AddRecords';
 
 interface PersonalInfo {
   id: number;
@@ -222,61 +218,15 @@ const PersonalInfoApp = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{selectedPerson ? 'Edit Person' : 'Add New Person'}</DialogTitle>
-        <DialogContent>
-          <Box component="form" onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            handleSave(new FormData(e.currentTarget));
-          }} sx={{ mt: 2 }}>
-            <Stack spacing={3}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                <Avatar
-                  sx={{ width: 100, height: 100 }}
-                  src={imagePreview || (selectedPerson?.image ? `${BASE_URL}storage/${selectedPerson.image}` : undefined)}
-                >
-                  {selectedPerson ? `${selectedPerson.first_name[0]}${selectedPerson.last_name[0]}` : 'UP'}
-                </Avatar>
-                <Button
-                  component="label"
-                  startIcon={<UploadIcon />}
-                  variant="outlined"
-                >
-                  Upload Photo
-                  <input 
-                    type="file" 
-                    name="image" 
-                    accept="image/*" 
-                    hidden 
-                    onChange={handleImageChange}
-                  />
-                </Button>
-              </Box>
-
-              <TextField label="First Name" name="first_name" defaultValue={selectedPerson?.first_name} required fullWidth />
-              <TextField label="Last Name" name="last_name" defaultValue={selectedPerson?.last_name} required fullWidth />
-              <TextField label="Email" name="email" type="email" defaultValue={selectedPerson?.email} required fullWidth />
-              <TextField 
-                label="Date of Birth" 
-                name="date_of_birth" 
-                type="date"
-                defaultValue={selectedPerson?.date_of_birth}
-                required
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField label="City" name="city" defaultValue={selectedPerson?.city} required fullWidth />
-              <TextField label="State" name="state" defaultValue={selectedPerson?.state} required fullWidth />
-              <TextField label="Country" name="country" defaultValue={selectedPerson?.country} required fullWidth />
-              
-              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                <Button type="submit" variant="contained">Save</Button>
-              </Box>
-            </Stack>
-          </Box>
-        </DialogContent>
-      </Dialog>
+      <AddRecords 
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onSave={handleSave}
+        selectedPerson={selectedPerson}
+        imagePreview={imagePreview}
+        onImageChange={handleImageChange}
+        BASE_URL={BASE_URL}
+      />
     </Box>
   );
 };
