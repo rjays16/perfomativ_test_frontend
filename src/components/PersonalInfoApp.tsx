@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Box,
   Card,
@@ -17,6 +17,8 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
+  ArrowUpward as ArrowUpIcon,
+  ArrowDownward as ArrowDownIcon
 } from '@mui/icons-material';
 import AddRecords from './AddRecords';
 import EditRecords from './EditRecords';
@@ -48,20 +50,11 @@ const PersonalInfoApp = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [personToDelete, setPersonToDelete] = useState<PersonalInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  useEffect(() => {
-    fetchPeople();
-  }, []);
-
-  useEffect(() => {
-    if (!isDialogOpen && !isEditDialogOpen) {
-      setImagePreview(undefined);
-    }
-  }, [isDialogOpen, isEditDialogOpen]);
-
-  const fetchPeople = async () => {
+  const fetchPeople = useCallback(async () => {
     try {
-      const response = await fetch(`${API_URL}/personal-information`);
+      const response = await fetch(`${API_URL}/personal-information?direction=${sortDirection}`);
       const data = await response.json();
       setPeople(data.sql_data);
     } catch (error) {
@@ -69,7 +62,17 @@ const PersonalInfoApp = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [sortDirection]);
+
+  useEffect(() => {
+    fetchPeople();
+  }, [fetchPeople]);
+
+  useEffect(() => {
+    if (!isDialogOpen && !isEditDialogOpen) {
+      setImagePreview(undefined);
+    }
+  }, [isDialogOpen, isEditDialogOpen]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -87,6 +90,10 @@ const PersonalInfoApp = () => {
     person.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     person.city.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleToggleSort = () => {
+    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+  };
 
   const handleSave = async (formData: FormData) => {
     try {
@@ -172,7 +179,23 @@ const PersonalInfoApp = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Photo</TableCell>
-                <TableCell>Full Name</TableCell>
+                <TableCell>
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      cursor: 'pointer',
+                      userSelect: 'none'
+                    }}
+                    onClick={handleToggleSort}
+                  >
+                    Full Name
+                    {sortDirection === 'asc' ? 
+                      <ArrowUpIcon fontSize="small" sx={{ ml: 1 }} /> : 
+                      <ArrowDownIcon fontSize="small" sx={{ ml: 1 }} />
+                    }
+                  </Box>
+                </TableCell>
                 <TableCell>Date of Birth</TableCell>
                 <TableCell>Place of Birth</TableCell>
                 <TableCell align="right">Actions</TableCell>
